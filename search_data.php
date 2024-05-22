@@ -8,7 +8,7 @@
 <body>
     <h1>Search Visitor Data</h1>
     <form action="search_data.php" method="get">
-        <label for="search_name">Search by First Name, Last Name, or Gender:</label>
+        <label for="search_name">Search by User Name:</label>
         <input type="text" id="search_name" name="search_name" required>
         <input type="submit" value="Search">
     </form>
@@ -32,18 +32,17 @@
         $search_name = $_GET["search_name"];
 
         // Construct SQL query to search by first name, last name, or gender
-        $sql = "SELECT visitors.*, comments.comments FROM visitors LEFT JOIN comments ON visitors.id = comments.id WHERE visitors.first_name LIKE '%$search_name%' OR visitors.last_name LIKE '%$search_name%' OR visitors.gender = '$search_name'";
+	$sql = "SELECT * FROM visitors WHERE user_name LIKE '%$search_name%'";
 
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    echo "<h2>Search Results:</h2>";
-    while ($row = $result->fetch_assoc()) {
-        echo "ID: " . $row["id"] . "<br>";
-        echo "First Name: " . $row["first_name"] . "<br>";
-        echo "Last Name: " . $row["last_name"] . "<br>";
-        echo "Gender: " . $row["gender"] . "<br>";
-        echo "Date of Birth: " . $row["dob"] . "<br>";
+	$result = $conn->query($sql);
+	if ($result->num_rows > 0) {
+        echo "<h2>Search Results:</h2>";
+	while ($row = $result->fetch_assoc()) {
+		echo "ID: " . $row["id"] . "<br>";
+		echo "User Name: " . $row["user_name"] . "<br>";
+	     	echo "Full Name: " . $row["first_name"] . " " . $row["last_name"] .  "<br>";
+            echo "Gender: " . $row["gender"] . "<br>";
+	echo "Date of Birth: " . $row["dob"] . "<br>";
         echo "Comment: " . $row["comments"] . "<br><br>";
     }
 } else {
@@ -55,4 +54,5 @@ if ($result->num_rows > 0) {
     ?>
 </body>
 </html>
+
 
