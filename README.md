@@ -1,6 +1,6 @@
 update -y
 
-install httpd wget php-fpm  mariadb105-server php-json php
+install httpd wget php-mysqlnd httpd php-fpm php-mysqli mariadb105-server php-json php php-devel stress git -y
 
 sudo ufw allow 'Apache'
 
