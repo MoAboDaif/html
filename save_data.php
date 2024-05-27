@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		echo "An error occurred: " . $e->getMessage();
 	}
 	try {
-	$sql1 = "INSERT INTO comments (visitor_id, comments) VALUES (LAST_INSERT_ID(), '$comment')"; 
+	$sql1 = "INSERT INTO comments (id, comments) VALUES (LAST_INSERT_ID(), '$comment')"; 
 		
 	if (($conn->query($sql1) === TRUE)) {
 		echo "Comment saved successfully!";

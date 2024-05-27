@@ -81,7 +81,7 @@
             $search_name = $conn->real_escape_string($_GET["search_name"]); // Sanitize input
 
             // Construct SQL query to search by first name, last name, or gender
-            $sql = "SELECT visitors.*, comments.comments FROM visitors LEFT JOIN comments ON visitors.id = comments.visitor_id WHERE visitors.first_name LIKE '%$search_name%' OR visitors.last_name LIKE '%$search_name%' OR visitors.gender = '$search_name'";
+            $sql = "SELECT visitors.*, comments.comments FROM visitors LEFT JOIN comments ON visitors.id = comments.id WHERE visitors.first_name LIKE '%$search_name%' OR visitors.last_name LIKE '%$search_name%' OR visitors.gender = '$search_name'";
 
             $result = $conn->query($sql);
 
