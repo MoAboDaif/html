@@ -33,12 +33,13 @@
         }
         input[type="text"],
         input[type="date"] {
+            width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             margin-left: 50px;
             margin-bottom: 20px;
-            max-width: 500px;
+            max-width: calc(var(--max-width-container) - 100px);
         }
         input[type="radio"] {
             margin-right: 10px;
@@ -54,11 +55,13 @@
             margin-bottom: 50px;
         }
         textarea[id="user_comment"] {
+            width: 100%;
             border: 1px solid #ccc;
             border-radius: 5px;
+            min-width: none;
             margin-left: 50px;
             margin-bottom: 20px;
-            max-width: 500px;
+            max-width: calc(var(--max-width-container) - 85px);
             max-height: 200px;
         }
         h1.white {
@@ -74,8 +77,6 @@
         <div class="container">
             <h1>Enter Visitor Data</h1>
             <form action="save_data.php" method="post">
-		    <label for="user_name">User Name</label>
-                <input type="text" id="user_name" name="user_name" required>
                 <label for="first_name">First Name:</label>
                 <input type="text" id="first_name" name="first_name" required>
                 <label for="last_name">Last Name:</label>
@@ -93,7 +94,7 @@
         <div class="container">
             <h1>Search Visitor Data</h1>
             <form action="search_data.php" method="get">
-                <input type="text" name="search" placeholder="Search by User Name">
+                <input type="text" name="search" placeholder="Search by name, job, or country">
                 <input type="submit" value="Search">
             </form>
         </div>
