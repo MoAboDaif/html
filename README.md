@@ -1,4 +1,4 @@
-update -y
+those are just some commands needed to be remembared
 
 install httpd wget php-mysqlnd httpd php-fpm php-mysqli mariadb105-server php-json php php-devel stress git -y
 
