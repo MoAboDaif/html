@@ -1,4 +1,5 @@
-those are just some commands needed to be remembared
+# those are just some commands needed to be remembared
+------------------------------------------------------
 
 install httpd wget php-mysqlnd httpd php-fpm php-mysqli mariadb105-server php-json php php-devel stress git -y
 
@@ -8,8 +9,10 @@ php -v
 
 sudo a2enmod php8.1
 
-install python2-minimal python2 dh-python python-is-python3 libapache2-mod-php8.1
---------------------------------------------------------------------------------------------------------
+install python2-minimal python2 dh-python python-is-python3 libapache2-mod-php8.1 <-- those where for ubuntu
+
+# mysql commands
+----------------
 
 sudo mysql_secure_installation
 
