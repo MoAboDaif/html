@@ -35,7 +35,8 @@ php8.3-mysql \
 php8.3-mbstring \
 php8.3-curl \
 php8.3-xml \
-php8.3-zip
+php8.3-zip \ 
+php-json
 ```
 
 **Verify PHP:**
