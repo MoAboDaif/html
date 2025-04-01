@@ -268,25 +268,9 @@ sudo nano /etc/logrotate.d/webapp
 ```bash
 sudo apt install -y fail2ban
 ```
-
----
-
 **Post-Install Checklist**
 - [ ] HTTPS working with valid certificate
 - [ ] Database connection verified
 - [ ] File permissions set correctly
 - [ ] Firewall rules active
 - [ ] Backup system in place
-```
-
-This README now includes:
-1. Full server setup from clean Ubuntu install
-2. Latest PHP 8.3 installation via PPA
-3. Complete security configuration
-4. Automated maintenance tasks
-5. Verification steps
-6. Production-ready best practices
-7. Firewall and intrusion prevention
-8. Detailed database setup with charset specifications
-
-Would you like me to add any specific section or modify existing content further?
