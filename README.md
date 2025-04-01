@@ -1,165 +1,273 @@
 # Visitor Data Management System
 
-A secure web application for managing visitor information with PHP and MySQL, featuring form submission validation and search functionality.
-
-## Features
-
-- 📝 Visitor data collection form with client/server validation
-- 🔍 Full-text search across visitor records and comments
-- 🔒 Secure database configuration with prepared statements
-- ♻️ Transaction management for data integrity
-- 📅 Date validation (minimum age enforcement)
-- 📊 Relationship database design (visitors ↔ comments)
-
 ## Prerequisites
 
-- Ubuntu Server 24.04 LTS
-- Apache 2.4+
-- PHP 8.1+ with extensions:
-  ```bash
-  sudo apt install php8.1 php8.1-mysql php8.1-json php8.1-mbstring
-  ```
-- MySQL 8.0+
-- Git
+- Fresh Ubuntu 24.04 LTS Server
+- Minimum 1GB RAM
+- Root or sudo privileges
+- Open ports: 80 (HTTP), 443 (HTTPS), 22 (SSH)
 
-## Installation
+## Installation Guide
 
-1. Clone repository:
-   ```bash
-   sudo git clone https://github.com/MoAboDaif/html.git /var/www
-   ```
+### 1. Server Setup
 
-2. Create MySQL database and user:
-   ```sql
-   CREATE DATABASE mywebsite;
-   CREATE USER 'myuser'@'localhost' IDENTIFIED WITH mysql_native_password BY 'mypassword';
-   GRANT ALL PRIVILEGES ON mywebsite.* TO 'myuser'@'localhost';
-   FLUSH PRIVILEGES;
-   ```
-
-3. Create tables:
-   ```sql
-   USE mywebsite;
-   
-   CREATE TABLE visitors (
-       id INT PRIMARY KEY AUTO_INCREMENT UNIQUE,
-       user_name VARCHAR(255) NOT NULL UNIQUE,
-       first_name VARCHAR(255) NOT NULL,
-       last_name VARCHAR(255) NOT NULL,
-       gender ENUM('Male', 'Female') NOT NULL,
-       dob DATE NOT NULL
-   );
-
-   CREATE TABLE comments (
-       id INT PRIMARY KEY AUTO_INCREMENT,
-       visitor_id INT NOT NULL,
-       comments VARCHAR(255) NOT NULL,
-       FOREIGN KEY (visitor_id) REFERENCES visitors(id) ON DELETE CASCADE
-   );
-   ```
-
-4. Configure database connection:
-   ```bash
-   sudo mkdir /etc/website_config
-   sudo mv /var/www/html/config.php /etc/website_config/config.php
-   ```
-   
-5. Set permissions:
-   ```bash
-   sudo chown -R www-data:www-data /var/www/html
-   sudo chmod 750 /etc/website_config
-   sudo chmod 640 /etc/website_config/config.php
-   ```
-
-## Security Best Practices
-
-- 🔑 Always use `mysql_native_password` authentication plugin
-- 🛡️ Keep database credentials outside web root
-- 🔄 Regular security updates:
-  ```bash
-  sudo apt update && sudo apt upgrade -y
-  ```
-- 📁 File permissions:
-  ```bash
-  sudo find /var/www/html -type d -exec chmod 755 {} \;
-  sudo find /var/www/html -type f -exec chmod 644 {} \;
-  ```
-
-## Usage
-
-1. Access application:
-   ```
-   http://your-server-ip/
-   ```
-
-2. Form validation includes:
-   - Required fields
-   - Username format (4-20 alphanumeric)
-   - Date of birth validation (minimum age 13)
-   - Gender selection enforcement
-
-3. Search functionality:
-   - Full-text search across names and comments
-   - Partial matches supported
-   - Results displayed in tabular format
-
-## Troubleshooting
-
-Common issues and solutions:
-
-### Database Connection Errors
+**Update System:**
 ```bash
-# Test MySQL connection:
-mysql -u myuser -p mywebsite -e "SELECT 1"
-
-# Check error logs:
-sudo tail -f /var/log/apache2/error.log
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y software-properties-common
 ```
 
-### Character Set Issues
-```sql
--- Verify charset configuration:
-SHOW VARIABLES LIKE 'character_set%';
-SHOW VARIABLES LIKE 'collation%';
+### 2. Install Latest PHP & Apache
+
+**Add PHP Repository:**
+```bash
+sudo add-apt-repository -y ppa:ondrej/php
+sudo apt update
 ```
 
-### Form Submission Errors
-```php
-// Temporary debug mode:
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+**Install Components:**
+```bash
+sudo apt install -y \
+apache2 \
+php8.3 \
+libapache2-mod-php8.3 \
+php8.3-mysql \
+php8.3-mbstring \
+php8.3-curl \
+php8.3-xml \
+php8.3-zip
 ```
 
-### Permission Issues
+**Verify PHP:**
+```bash
+php -v
+# Should show PHP 8.3.x
+```
+
+### 3. Install MySQL 8.0
+
+**Install Database Server:**
+```bash
+sudo apt install -y mysql-server
+```
+
+**Secure MySQL:**
+```bash
+sudo mysql_secure_installation
+```
+- Follow prompts to set root password and secure installation
+
+### 4. Application Setup
+
+**Clone Repository:**
+```bash
+sudo rm -rf /var/www/html/*
+sudo git clone https://github.com/MoAboDaif/html.git /var/www/html
+```
+
+**Configure Permissions:**
 ```bash
 sudo chown -R www-data:www-data /var/www/html
-sudo chmod -R 755 /var/www/html
+sudo find /var/www/html -type d -exec chmod 755 {} \;
+sudo find /var/www/html -type f -exec chmod 644 {} \;
 ```
+
+### 5. Database Configuration
+
+**MySQL Root Login:**
+```bash
+sudo mysql -u root -p
+```
+
+**Create Application Database:**
+```sql
+CREATE DATABASE mywebsite 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+CREATE USER 'webuser'@'localhost' 
+IDENTIFIED WITH mysql_native_password 
+BY 'StrongPassword123!';
+
+GRANT ALL PRIVILEGES ON mywebsite.* 
+TO 'webuser'@'localhost';
+
+FLUSH PRIVILEGES;
+```
+
+**Create Tables:**
+```sql
+USE mywebsite;
+
+CREATE TABLE visitors (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_name VARCHAR(255) NOT NULL UNIQUE,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    gender ENUM('Male','Female') NOT NULL,
+    dob DATE NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE comments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    visitor_id INT NOT NULL,
+    comments VARCHAR(255) NOT NULL,
+    FOREIGN KEY (visitor_id) 
+    REFERENCES visitors(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+### 6. Application Configuration
+
+**Create Config File:**
+```bash
+sudo mkdir /etc/webapp
+sudo nano /etc/webapp/config.php
+```
+
+**Config Contents:**
+```php
+<?php
+return [
+    'host' => 'localhost',
+    'username' => 'webuser',
+    'password' => 'StrongPassword123!',
+    'dbname' => 'mywebsite',
+    'charset' => 'utf8mb4'
+];
+```
+
+**Secure Config File:**
+```bash
+sudo chown root:www-data /etc/webapp/config.php
+sudo chmod 640 /etc/webapp/config.php
+```
+
+### 7. Apache Configuration
+
+**Create Virtual Host:**
+```bash
+sudo nano /etc/apache2/sites-available/webapp.conf
+```
+
+**Virtual Host Content:**
+```apache
+<VirtualHost *:80>
+    ServerAdmin admin@yourdomain.com
+    DocumentRoot /var/www/html
+    ServerName your-domain.com
+
+    <Directory /var/www/html>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+
+**Enable Configuration:**
+```bash
+sudo a2dissite 000-default.conf
+sudo a2ensite webapp.conf
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+```
+
+### 8. SSL Setup (Recommended)
+
+**Install Certbot:**
+```bash
+sudo apt install -y certbot python3-certbot-apache
+```
+
+**Obtain Certificate:**
+```bash
+sudo certbot --apache
+```
+
+## Verification
+
+**Check Web Server:**
+```bash
+systemctl status apache2
+curl -I http://localhost
+```
+
+**Test Database Connection:**
+```bash
+mysql -u webuser -p mywebsite -e "SHOW TABLES;"
+```
+
+**PHP Info Test:**
+```bash
+sudo nano /var/www/html/phpinfo.php
+```
+```php
+<?php phpinfo(); ?>
+```
+Access via browser and then remove the file.
 
 ## Maintenance
 
-1. Database backup (crontab):
-   ```bash
-   0 2 * * * mysqldump -u myuser -p'mypassword' mywebsite > /backups/db_$(date +\%F).sql
-   ```
-
-2. Auto-update script:
-   ```bash
-   #!/bin/bash
-   cd /var/www/html
-   sudo git pull origin main
-   sudo systemctl restart apache2
-   ```
-
----
-
-**Tested Environment**  
-Ubuntu 24.04 LTS | PHP 8.1.2 | MySQL 8.0.41 | Apache 2.4.58
+**Automatic Updates:**
+```bash
+sudo crontab -e
+```
+Add:
+```cron
+0 3 * * * apt update && apt upgrade -y
+0 4 * * * cd /var/www/html && git pull
 ```
 
-This README includes:
-1. Detailed installation instructions from our setup process
-2. Security measures implemented during configuration
-3. Troubleshooting steps from our debugging sessions
-4. Maintenance procedures based on server setup
-5. Environment specifics from our testing
+**Backup Script:**
+```bash
+sudo nano /usr/local/bin/backup-webapp.sh
+```
+```bash
+#!/bin/bash
+mysqldump -u webuser -p'StrongPassword123!' mywebsite > /backups/db-$(date +\%F).sql
+tar -czf /backups/webapp-$(date +\%F).tar.gz /var/www/html
+```
+
+## Security Best Practices
+
+1. **Firewall Configuration:**
+```bash
+sudo ufw allow OpenSSH
+sudo ufw allow 'Apache Full'
+sudo ufw enable
+```
+
+2. **Daily Log Monitoring:**
+```bash
+sudo nano /etc/logrotate.d/webapp
+```
+```
+/var/log/apache2/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 640 root adm
+    sharedscripts
+    postrotate
+        systemctl reload apache2 > /dev/null
+    endscript
+}
+```
+
+3. **Intrusion Detection:**
+```bash
+sudo apt install -y fail2ban
+```
+**Post-Install Checklist**
+- [ ] HTTPS working with valid certificate
+- [ ] Database connection verified
+- [ ] File permissions set correctly
+- [ ] Firewall rules active
+- [ ] Backup system in place
