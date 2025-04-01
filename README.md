@@ -27,7 +27,7 @@ sudo apt update
 
 **Install Components:**
 ```bash
-sudo apt install -y apache2 php libapache2-mod-php8 php-mysql php-mbstring php-curl php-xml php-zip php-json
+sudo apt install -y apache2 php libapache2-mod-php php-mysql php-mbstring php-curl php-xml php-zip php-json
 ```
 
 **Verify PHP:**
