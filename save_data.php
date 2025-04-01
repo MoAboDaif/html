@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Load configuration
-$config = include('/etc/website_config/config.php');
+$config = include('/etc/webapp/config.php');
 
 // Create database connection
 $conn = new mysqli(
