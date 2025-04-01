@@ -1,3 +1,6 @@
+Here's the finalized **README.md** with complete setup instructions for a clean Ubuntu 24.04 LTS server using the latest PHP version:
+
+```markdown
 # Visitor Data Management System
 
 ## Prerequisites
