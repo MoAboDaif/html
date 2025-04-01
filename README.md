@@ -17,7 +17,7 @@ A secure web application for managing visitor information with PHP and MySQL, fe
 - Apache 2.4+
 - PHP 8.1+ with extensions:
   ```bash
-  sudo apt install php8.1 php8.1-mysql php8.1-json php8.1-mbstring
+  sudo apt install php php-mysql php-json php-mbstring
   ```
 - MySQL 8.0+
 - Git
@@ -25,8 +25,12 @@ A secure web application for managing visitor information with PHP and MySQL, fe
 ## Installation
 
 1. Clone repository:
-   ```bash
-   sudo git clone https://github.com/MoAboDaif/html.git /var/www
+   ```bash 
+   cd
+   git clone https://github.com/MoAboDaif/html.git
+   sudo cp index.html /var/www/html/
+   sudo cp save_data.php /var/www/html/
+   sudo cp search_data.php /var/www/html/
    ```
 
 2. Create MySQL database and user:
@@ -61,7 +65,7 @@ A secure web application for managing visitor information with PHP and MySQL, fe
 4. Configure database connection:
    ```bash
    sudo mkdir /etc/website_config
-   sudo mv /var/www/html/config.php /etc/website_config/config.php
+   sudo cp ~/config.php /etc/website_config/config.php
    ```
    
 5. Set permissions:
@@ -146,15 +150,21 @@ sudo chmod -R 755 /var/www/html
 2. Auto-update script:
    ```bash
    #!/bin/bash
-   cd /var/www/html
+   cd ~/html
    sudo git pull origin main
+   sudo cp index.html /var/www/html/
+   sudo cp save_data.php /var/www/html/
+   sudo cp search_data.php /var/www/html/
+   sudo chown -R www-data:www-data /var/www/html
+   sudo chmod 750 /etc/website_config
+   sudo chmod 640 /etc/website_config/config.php
    sudo systemctl restart apache2
    ```
 
 ---
 
 **Tested Environment**  
-Ubuntu 24.04 LTS | PHP 8.1.2 | MySQL 8.0.41 | Apache 2.4.58
+Ubuntu 24.04 LTS | PHP 8.3.6 | MySQL 8.0.41 | Apache 2.4.58
 ```
 
 This README includes:
