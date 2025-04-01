@@ -1,6 +1,6 @@
 <?php
 // Load configuration
-$config = include('/etc/website_config/config.php');
+$config = include('/etc/webapp/config.php');
 
 // Create database connection
 $conn = new mysqli(
