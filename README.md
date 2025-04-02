@@ -84,7 +84,7 @@ CREATE TABLE visitors (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
-    visit_date DATE NOT NULL,
+    visit_date DATE NOT NULL DEFAULT (CURRENT_DATE),
     check_in_time TIME,
     check_out_time TIME,
     purpose_of_visit TEXT,
