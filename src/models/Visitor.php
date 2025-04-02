@@ -24,8 +24,8 @@ class Visitor {
     
     public function search($query) {
         $search = "%$query%";
-        $stmt = $this->pdo->prepare("SELECT * FROM visitors WHERE name LIKE :query OR email LIKE :query");
-        $stmt->execute(['query' => $search]);
+        $stmt = $this->pdo->prepare("SELECT * FROM visitors WHERE name LIKE :name OR email LIKE :email");
+        $stmt->execute(['name' => $search, 'email' => $search]);
         return $stmt->fetchAll();
     }
 }
