@@ -278,10 +278,8 @@ foreach ($required_keys as $key) {
     }
 }
 ```
-```
 
 **2. Enhance Security Section:**
-```markdown
 4. **Disable PHP Error Display in Production:**
 ```bash
 sudo nano /etc/php/8.3/apache2/php.ini
@@ -299,7 +297,6 @@ log_errors = On
 <FilesMatch "^config\.php$">
     Require all denied
 </FilesMatch>
-```
 ```
 
 **3. Add Emergency Troubleshooting Section:**
@@ -327,10 +324,8 @@ ALTER USER 'webuser'@'localhost' IDENTIFIED WITH mysql_native_password BY 'NewSt
 FLUSH PRIVILEGES;
 # Remember to update /etc/webapp/config.php
 ```
-```
 
 **4. Update Backup Script Security:**
-```markdown
 **Secure Backup Script:**
 ```bash
 # Instead of plaintext password:
@@ -348,10 +343,8 @@ chmod 600 ~/.my.cnf
 # Update backup script to use:
 mysqldump mywebsite > /backups/db-$(date +\%F).sql
 ```
-```
 
 **5. Add Post-Install Verification Test:**
-```markdown
 **End-to-End Test:**
 1. Submit form via browser
 2. Check database entry:
@@ -363,10 +356,8 @@ mysql -u webuser -p mywebsite -e "SELECT * FROM visitors;"
 ```bash
 curl -I https://your-domain.com
 ```
-```
 
 **6. Add Version Compatibility Note:**
-```markdown
 ## Compatibility Notice
 Tested with:
 - PHP 8.3.4
@@ -375,10 +366,8 @@ Tested with:
 - Ubuntu 24.04 LTS
 
 Requires `mysql_native_password` authentication plugin
-```
 
 **7. Add Critical File Monitoring:**
-```markdown
 ## Monitoring
 **Track config file changes:**
 ```bash
