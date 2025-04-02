@@ -1,388 +1,45 @@
 # Visitor Data Management System
 
-## Prerequisites
-
-- Fresh Ubuntu 24.04 LTS Server
-- Minimum 1GB RAM
-- Root or sudo privileges
-- Open ports: 80 (HTTP), 443 (HTTPS), 22 (SSH)
-
-## Installation Guide
-
-### 1. Server Setup
-
-**Update System:**
-```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y software-properties-common
-```
-
-### 2. Install Latest PHP & Apache
-
-**Add PHP Repository:**
-```bash
-sudo add-apt-repository -y ppa:ondrej/php
-sudo apt update
-```
-
-**Install Components:**
-```bash
-sudo apt install -y apache2 php libapache2-mod-php php-mysql php-mbstring php-curl php-xml php-zip php-json
-```
-
-**Verify PHP:**
-```bash
-php -v
-# Should show PHP 8.3.x
-```
-
-### 3. Install MySQL 8.0
-
-**Install Database Server:**
-```bash
-sudo apt install -y mysql-server
-```
-
-**Secure MySQL:**
-```bash
-sudo mysql_secure_installation
-```
-- Follow prompts to set root password and secure installation
-
-### 4. Application Setup
-
-**Clone Repository:**
-```bash
-sudo rm -rf /var/www/html/*
-sudo git clone https://github.com/MoAboDaif/html.git /var/www/html
-```
-
-**Configure Permissions:**
-```bash
-sudo chown -R www-data:www-data /var/www/html
-sudo find /var/www/html -type d -exec chmod 755 {} \;
-sudo find /var/www/html -type f -exec chmod 644 {} \;
-```
-
-### 5. Database Configuration
-
-**MySQL Root Login:**
-```bash
-sudo mysql -u root -p
-```
-
-**Create Application Database:**
-```sql
-CREATE DATABASE mywebsite 
-CHARACTER SET utf8mb4 
-COLLATE utf8mb4_unicode_ci;
-
-CREATE USER 'webuser'@'localhost' 
-IDENTIFIED WITH mysql_native_password 
-BY 'StrongPassword123!';
-
-GRANT ALL PRIVILEGES ON mywebsite.* 
-TO 'webuser'@'localhost';
-
-FLUSH PRIVILEGES;
-```
-
-**Create Tables:**
-```sql
-USE mywebsite;
-
-CREATE TABLE visitors (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_name VARCHAR(255) NOT NULL UNIQUE,
-    first_name VARCHAR(255) NOT NULL,
-    last_name VARCHAR(255) NOT NULL,
-    gender ENUM('Male','Female') NOT NULL,
-    dob DATE NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE comments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    visitor_id INT NOT NULL,
-    comments VARCHAR(255) NOT NULL,
-    FOREIGN KEY (visitor_id) 
-    REFERENCES visitors(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-```
-
-### 6. Application Configuration
-
-**Create Config File:**
-```bash
-sudo mkdir /etc/webapp
-sudo nano /etc/webapp/config.php
-```
-
-**Config Contents:**
-```php
-<?php
-return [
-    'host' => 'localhost',
-    'username' => 'webuser',
-    'password' => 'StrongPassword123!',
-    'dbname' => 'mywebsite',
-    'charset' => 'utf8mb4'
-];
-```
-
-**Secure Config File:**
-```bash
-sudo chown root:www-data /etc/webapp/config.php
-sudo chmod 640 /etc/webapp/config.php
-```
-
-### 7. Apache Configuration
-
-**Create Virtual Host:**
-```bash
-sudo nano /etc/apache2/sites-available/webapp.conf
-```
-
-**Virtual Host Content:**
-```apache
-<VirtualHost *:80>
-    ServerAdmin admin@yourdomain.com
-    DocumentRoot /var/www/html
-    ServerName your-domain.com
-
-    <Directory /var/www/html>
-        Options -Indexes +FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-```
-
-**Enable Configuration:**
-```bash
-sudo a2dissite 000-default.conf
-sudo a2ensite webapp.conf
-sudo a2enmod rewrite
-sudo systemctl restart apache2
-```
-
-### 8. SSL Setup (Recommended)
-
-**Install Certbot:**
-```bash
-sudo apt install -y certbot python3-certbot-apache
-```
-
-**Obtain Certificate:**
-```bash
-sudo certbot --apache
-```
-
-## Verification
-
-**Check Web Server:**
-```bash
-systemctl status apache2
-curl -I http://localhost
-```
-
-**Test Database Connection:**
-```bash
-mysql -u webuser -p mywebsite -e "SHOW TABLES;"
-```
-
-**PHP Info Test:**
-```bash
-sudo nano /var/www/html/phpinfo.php
-```
-```php
-<?php phpinfo(); ?>
-```
-Access via browser and then remove the file.
-
-## Maintenance
-
-**Automatic Updates:**
-```bash
-sudo crontab -e
-```
-Add:
-```cron
-0 3 * * * apt update && apt upgrade -y
-0 4 * * * cd /var/www/html && git pull
-```
-
-**Backup Script:**
-```bash
-sudo nano /usr/local/bin/backup-webapp.sh
-```
-```bash
-#!/bin/bash
-mysqldump -u webuser -p'StrongPassword123!' mywebsite > /backups/db-$(date +\%F).sql
-tar -czf /backups/webapp-$(date +\%F).tar.gz /var/www/html
-```
-
-## Security Best Practices
-
-1. **Firewall Configuration:**
-```bash
-sudo ufw allow OpenSSH
-sudo ufw allow 'Apache Full'
-sudo ufw enable
-```
-
-2. **Daily Log Monitoring:**
-```bash
-sudo nano /etc/logrotate.d/webapp
-```
-```
-/var/log/apache2/*.log {
-    daily
-    missingok
-    rotate 14
-    compress
-    delaycompress
-    notifempty
-    create 640 root adm
-    sharedscripts
-    postrotate
-        systemctl reload apache2 > /dev/null
-    endscript
-}
-```
-
-3. **Intrusion Detection:**
-```bash
-sudo apt install -y fail2ban
-```
-
-### 9. Configuration Validation
-**Add safety checks to PHP files** (`save_data.php` and `search_data.php`):
-```php
-// Load configuration with error handling
-$config_path = '/etc/webapp/config.php';
-
-if (!file_exists($config_path)) {
-    die("Configuration file missing. Contact administrator.");
-}
-
-$config = include($config_path);
-
-// Verify required configuration keys
-$required_keys = ['host', 'username', 'password', 'dbname'];
-foreach ($required_keys as $key) {
-    if (!isset($config[$key])) {
-        die("Invalid configuration: Missing $key");
-    }
-}
-```
-
-**2. Enhance Security Section:**
-4. **Disable PHP Error Display in Production:**
-```bash
-sudo nano /etc/php/8.3/apache2/php.ini
-```
-Set:
-```ini
-display_errors = Off
-display_startup_errors = Off
-log_errors = On
-```
-
-5. **Prevent Configuration File Access:**
-```apache
-# Add to webapp.conf
-<FilesMatch "^config\.php$">
-    Require all denied
-</FilesMatch>
-```
-
-**3. Add Emergency Troubleshooting Section:**
-```markdown
-## Emergency Troubleshooting
-
-**Database Connection Issues:**
-```bash
-# Test connection as web user
-sudo -u www-data php -r '
-    $c = include("/etc/webapp/config.php");
-    new mysqli($c["host"], $c["username"], $c["password"], $c["dbname"]);'
-```
-
-**File Permission Reset:**
-```bash
-sudo find /var/www/html -type d -exec chmod 750 {} \;
-sudo find /var/www/html -type f -exec chmod 640 {} \;
-sudo chmod 640 /etc/webapp/config.php
-```
-
-**Password Reset Procedure:**
-```sql
-ALTER USER 'webuser'@'localhost' IDENTIFIED WITH mysql_native_password BY 'NewStrongPassword456!';
-FLUSH PRIVILEGES;
-# Remember to update /etc/webapp/config.php
-```
-
-**4. Update Backup Script Security:**
-**Secure Backup Script:**
-```bash
-# Instead of plaintext password:
-sudo nano ~/.my.cnf
-```
-Add:
-```ini
-[mysqldump]
-user=webuser
-password=StrongPassword123!
-```
-Then:
-```bash
-chmod 600 ~/.my.cnf
-# Update backup script to use:
-mysqldump mywebsite > /backups/db-$(date +\%F).sql
-```
-
-**5. Add Post-Install Verification Test:**
-**End-to-End Test:**
-1. Submit form via browser
-2. Check database entry:
-```bash
-mysql -u webuser -p mywebsite -e "SELECT * FROM visitors;"
-```
-3. Test search functionality
-4. Verify SSL working:
-```bash
-curl -I https://your-domain.com
-```
-
-**6. Add Version Compatibility Note:**
-## Compatibility Notice
-Tested with:
-- PHP 8.3.4
-- MySQL 8.0.41
-- Apache 2.4.58
-- Ubuntu 24.04 LTS
-
-Requires `mysql_native_password` authentication plugin
-
-**7. Add Critical File Monitoring:**
-## Monitoring
-**Track config file changes:**
-```bash
-sudo apt install -y auditd
-sudo auditctl -w /etc/webapp/config.php -p war -k webapp_config
-```
-
-**Check audit logs:**
-```bash
-sudo ausearch -k webapp_config
-```
-
-**Post-Install Checklist**
-- [ ] HTTPS working with valid certificate
-- [ ] Database connection verified
-- [ ] File permissions set correctly
-- [ ] Firewall rules active
-- [ ] Backup system in place
+## Overview
+This is a visitor management system built using PHP, MySQL, and an MVC architecture. It allows you to add visitor details and search through stored visitors.
+
+## Requirements
+- PHP 7.4 or later
+- MySQL
+- Apache/Nginx or similar web server
+
+## Installation
+
+1. **Clone the Repository:**
+    ```bash
+    git clone https://github.com/MoAboDaif/html.git
+    ```
+
+2. **Setup the Database:**
+    - Create a MySQL database (e.g. `visitor_db`).
+    - Create the `visitors` table:
+    ```sql
+    CREATE TABLE visitors (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    ```
+
+3. **Update the Configuration:**
+    - Edit `config/db.php` with your database credentials.
+
+4. **Configure Your Web Server:**
+    - Set the document root to the `public/` directory.
+
+5. **Access the Application:**
+    - Open your browser and navigate to your server's URL.
+
+## Security Considerations
+- Uses prepared statements with PDO to prevent SQL injection.
+- Validates and sanitizes all user inputs.
+- Consider adding CSRF protection for forms in production.
+
+## License
+[MIT](LICENSE)
